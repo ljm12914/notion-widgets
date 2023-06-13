@@ -9,6 +9,7 @@
     -webkit-tap-highlight-color: transparent;
     overflow: hidden;
     color: #110101;
+    overflow: visible;
 }
 ::selection{
     background-color: #909ad7;
