@@ -44,37 +44,38 @@
         root.appendChild(document.createElement("no-args"));
         return;
     }
-    const [date, time] = arg.split("%20"), finalDate = new Date(`${date} ${time}`);
+    const [date, time] = arg.split("_"), finalDate = new Date(`${date} ${time}`);
     if(isNaN(finalDate.getTime())){
         root.appendChild(document.createElement("no-args"));
         return;
     }
 //#endregion
 //#region 计算并显示倒计时
-    const originDelta = finalDate.getTime() - new Date().getTime();
-    if(originDelta <= 0){
-        const reachedEl = document.createElement("reach-ed");
-        reachedEl.appendChild(createSlot("date",
-            `${finalDate.getFullYear()}.${finalDate.getMonth() + 1}.${finalDate.getDate()} ${(finalDate.getHours()+"").padStart(2, "0")}:${(finalDate.getMinutes()+"").padStart(2, "0")}:${(finalDate.getSeconds()+"").padStart(2, "0")}:${(finalDate.getMilliseconds()+"").padStart(3, "0")}`
-        ));
-        root.appendChild(reachedEl);
-    }
-    else{
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-        function updateCountdown(){
-            root.innerHTML = "";
+    updateCountdown();
+    var id = setInterval(updateCountdown, 999);
+    function updateCountdown(){
+        root.innerHTML = "";
+        console.log(finalDate.getTime() - new Date().getTime());
+        if(finalDate.getTime() - new Date().getTime() <= 1000){
+            if(id) clearInterval(id);
+            const reachedEl = document.createElement("reach-ed");
+            reachedEl.appendChild(createSlot("date",
+                `${finalDate.getFullYear()}.${finalDate.getMonth() + 1}.${finalDate.getDate()} ${(finalDate.getHours()+"").padStart(2, "0")}:${(finalDate.getMinutes()+"").padStart(2, "0")}:${(finalDate.getSeconds()+"").padStart(2, "0")}:${(finalDate.getMilliseconds()+"").padStart(3, "0")}`
+            ));
+            root.appendChild(reachedEl);
+        }
+        else{
             const
-                deltaDate = new Date(finalDate.getTime() - new Date().getTime()),
-                countDownArray = [ //0=>1970.1.1 08:00:00，做出相应调整
-                    [deltaDate.getFullYear() - 1970, "年"],
-                    [deltaDate.getMonth(), "月"], //+1-1
-                    [deltaDate.getDate() - 1, "天"],
-                    [deltaDate.getHours() - 8, "小时"],
-                    [deltaDate.getMinutes(), "分钟"],
-                    [deltaDate.getSeconds(), "秒"]
-                ];
-            for(let i = 0; i < countDownArray.length; i++) showCountdown(countDownArray[i][0], countDownArray[i][1]);
+            deltaDate = new Date(finalDate.getTime() - new Date().getTime()),
+            countDownArray = [ //0=>1970.1.1 08:00:00，做出相应调整
+                [deltaDate.getFullYear() - 1970, "年"],
+                [deltaDate.getMonth(), "月"], //+1-1
+                [deltaDate.getDate() - 1, "天"],
+                [deltaDate.getHours() - 8, "小时"],
+                [deltaDate.getMinutes(), "分钟"],
+                [deltaDate.getSeconds(), "秒"]
+            ];
+        for(let i = 0; i < countDownArray.length; i++) if(countDownArray[i][0] > 0) showCountdown(countDownArray[i][0], countDownArray[i][1]);
         }
     }
     /**@type {(data :number, unit :string)=>void}*/

@@ -19,11 +19,24 @@
                     display: flex;
                     flex-flow: column nowrap;
                     align-items: center;
+                    background-color: #8cce82;
+                    padding: .8rem;
+                    border-radius: .6rem;
+                    width: 4.6rem;
+                    height: 5.2rem;
+                }
+                .data{
+                    font-size: 4rem;
+                    line-height: 3.8rem;
+                    font-weight: bold;
+                }
+                .unit{
+                    font-size: 1.25rem;
                 }
             </style>
             <div class="wrapper">
-                <div><slot name="data"></slot></div>
-                <div><slot name="unit"></slot></div>
+                <div class="data"><slot name="data"></slot></div>
+                <div class="unit"><slot name="unit"></slot></div>
             </div>
         </template>
         <template id="reached">
@@ -38,6 +51,7 @@
                     display: flex;
                     flex-flow: column nowrap;
                     align-items: center;
+                    font-size: 1.4rem;
                 }
             </style>
             <div class="wrapper">
@@ -61,7 +75,7 @@
             </style>
             <div class="wrapper">
                 <div>未输入有效参数。</div>
-                <div>参数格式：<code>d=&lt;年份&gt;.&lt;月份&gt;.&lt;日期&gt;&nbsp;&lt;小时&gt;:&lt;分钟&gt;:&lt;秒&gt;:&lt;毫秒（三位）&gt;。</code></div>
+                <div>参数格式：<code>d=&lt;年份&gt;.&lt;月份&gt;.&lt;日期&gt;_&lt;小时&gt;:&lt;分钟&gt;:&lt;秒&gt;:&lt;毫秒（三位）&gt;。</code></div>
             </div>
         </template>
     </body>
