@@ -30,5 +30,5 @@ body{
 #root{
     display: flex;
     flex-flow: row nowrap;
-    gap: min(.4rem, 5vw);
+    gap: min(.4rem, 3vw);
 }
