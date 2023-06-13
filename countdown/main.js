@@ -38,6 +38,10 @@
             "YYYY.M.D HH",       "YY.M.D HH",       "M.D HH",
         ], true);
     let duration = dayjs.duration(finalDate.diff(dayjs()));
+    if(isNaN(duration.asMilliseconds())){
+        root.appendChild(document.createElement("no-args"));
+        return;
+    }
 //#endregion
 //#region 显示并更新倒计时
     updateCountdown();
