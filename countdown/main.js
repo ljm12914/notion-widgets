@@ -3,7 +3,7 @@
     class Countdown extends HTMLElement{
         constructor(){
             super();
-            let shadow = this.attachShadow({mode: "closed"});
+            const shadow = this.attachShadow({mode: "closed"});
             shadow.appendChild(document.getElementById("countdown").content.cloneNode(true));
         }
     }
@@ -11,7 +11,7 @@
     class Noargs extends HTMLElement{
         constructor(){
             super();
-            let shadow = this.attachShadow({mode: "closed"});
+            const shadow = this.attachShadow({mode: "closed"});
             shadow.appendChild(document.getElementById("noargs").content.cloneNode(true));
         }
     }
@@ -19,63 +19,51 @@
     class Reached extends HTMLElement{
         constructor(){
             super();
-            let shadow = this.attachShadow({mode: "closed"});
+            const shadow = this.attachShadow({mode: "closed"});
             shadow.appendChild(document.getElementById("reached").content.cloneNode(true));
         }
     }
     customElements.define("reach-ed", Reached);
 //#endregion
-//#region 获得输入参数
+//#region day.js 交互
     const
-        arg = (()=>{
-            let s = location.search;
-            s = s.substring(1, s.length);
-            s = s.split("&");
-            for(let i = 0; i < s.length; i++){
-                let sis = s[i].split("=");
-                if(sis[0] === "d") return sis[1];
-            }
-            return null;
-        })(),
-//#endregion
+        arg = location.search.substring(1, location.search.length).replace("_", " "),
         root = document.getElementById("root");
-//#region 将输入参数转换为Date对象
-    if(arg === null){
-        root.appendChild(document.createElement("no-args"));
-        return;
-    }
-    const [date, time] = arg.split("_"), finalDate = new Date(`${date} ${time}`);
-    if(isNaN(finalDate.getTime())){
-        root.appendChild(document.createElement("no-args"));
-        return;
-    }
+    dayjs.extend(dayjs_plugin_customParseFormat);
+    dayjs.extend(dayjs_plugin_duration);
+    const
+        finalDate = dayjs(arg, [
+            "YYYY.M.D HH:mm:ss", "YY.M.D HH:mm:ss", "M.D HH:mm:ss",
+            "YYYY.M.D HH:mm",    "YY.M.D HH:mm",    "M.D HH:mm",
+            "YYYY.M.D HH",       "YY.M.D HH",       "M.D HH",
+        ], true);
+    let duration = dayjs.duration(finalDate.diff(dayjs()));
 //#endregion
-//#region 计算并显示倒计时
+//#region 显示并更新倒计时
     updateCountdown();
+    //必须用 var 因为会在创建这个前就访问！
     var id = setInterval(updateCountdown, 999);
     function updateCountdown(){
         root.innerHTML = "";
-        console.log(finalDate.getTime() - new Date().getTime());
-        if(finalDate.getTime() - new Date().getTime() <= 1000){
+        duration = dayjs.duration(finalDate.diff(dayjs()));
+        if(duration.asMilliseconds() < 0){
             if(id) clearInterval(id);
             const reachedEl = document.createElement("reach-ed");
             reachedEl.appendChild(createSlot("date",
-                `${finalDate.getFullYear()}.${finalDate.getMonth() + 1}.${finalDate.getDate()} ${(finalDate.getHours()+"").padStart(2, "0")}:${(finalDate.getMinutes()+"").padStart(2, "0")}:${(finalDate.getSeconds()+"").padStart(2, "0")}:${(finalDate.getMilliseconds()+"").padStart(3, "0")}`
+                `${finalDate.year()}.${finalDate.month() + 1}.${finalDate.date()} ${(finalDate.hour()+"").padStart(2, "0")}:${(finalDate.minute()+"").padStart(2, "0")}:${(finalDate.second()+"").padStart(2, "0")}`
             ));
             root.appendChild(reachedEl);
         }
         else{
-            const
-            deltaDate = new Date(finalDate.getTime() - new Date().getTime()),
-            countDownArray = [ //0=>1970.1.1 08:00:00，做出相应调整
-                [deltaDate.getFullYear() - 1970, "年"],
-                [deltaDate.getMonth(), "月"], //+1-1
-                [deltaDate.getDate() - 1, "天"],
-                [deltaDate.getHours() - 8, "小时"],
-                [deltaDate.getMinutes(), "分钟"],
-                [deltaDate.getSeconds(), "秒"]
+            const countDownArray = [
+                [duration.years(), "年"],
+                [duration.months(), "月"],
+                [duration.days(), "天"],
+                [duration.hours(), "小时"],
+                [duration.minutes(), "分钟"],
+                [duration.seconds(), "秒"]
             ];
-        for(let i = 0; i < countDownArray.length; i++) if(countDownArray[i][0] > 0) showCountdown(countDownArray[i][0], countDownArray[i][1]);
+            for(let i = 0; i < countDownArray.length; i++) if(countDownArray[i][0] >= 0) showCountdown(countDownArray[i][0], countDownArray[i][1]);
         }
     }
     /**@type {(data :number, unit :string)=>void}*/
